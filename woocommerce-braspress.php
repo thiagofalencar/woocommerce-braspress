@@ -1,75 +1,108 @@
 <?php
 
 /**
- * The plugin bootstrap file
+ * This is the bootstrap file of Woocommerce Braspress.
  *
- * This file is read by WordPress to generate the plugin information in the plugin
- * admin area. This file also includes all of the dependencies used by the plugin,
- * registers the activation and deactivation functions, and defines a function
- * that starts the plugin.
+ * This file is ready to load the initial functions of
+ * the Woocommerce Braspress plugin, like WordPress hooks,
+ * filters, actions and dependencies.
  *
- * @link              http://example.com
  * @since             1.0.0
- * @package           Plugin_Name
+ * @package           WC-Braspress
  *
- * @wordpress-plugin
- * Plugin Name:       Woocommerce Brasppress
+ * Plugin Name:       Woocommerce Braspress
  * Plugin URI:        https://github.com/thiagofalencar/woocommerce-braspress
  * Description:       This is an unofficial Braspress Shipping method to Woocommerce.
  * Version:           1.0.0
- * Author:            Thiago Alencar
+ * Author:            Thiago Alencar <thiagofalencar@gmail.com>
  * Author URI:        https://github.com/thiagofalencar
  * License:           GPL-2.0+
- * License URI:       https://github.com/thiagofalencar
+ * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       woocommerce-braspress
  * Domain Path:       /languages
  */
 
-// If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
-	die;
+// Abort if was executed directly.
+defined( 'WPINC' ) or die;
+
+/**
+ * The core class of Woocommerce-Braspress,
+ * that is used to define many aspects about this plugin.
+ */
+require plugin_dir_path( __FILE__ ) . 'includes/class-wc-braspress.php';
+require plugin_dir_path( __FILE__ ) . 'includes/class-wc-braspress-loader.php';
+
+/**
+ * This function runs during Woocommerce-Braspress activation.
+ */
+function activate_woocommerce_braspress() {
+	wc_require_class(
+		plugin_dir_path( __FILE__ ) . 'includes/class-wc-braspress-activator.php',
+		'WC_Braspress_Activator'
+	)->activate();
 }
 
+
+
 /**
- * The code that runs during plugin activation.
- * This action is documented in includes/class-plugin-name-activator.php
+ * This function runs during Woocommerce-Braspress deactivation.
  */
-function activate_plugin_name() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-plugin-name-activator.php';
-	Plugin_Name_Activator::activate();
+function deactivate_woocommerce_braspress() {
+	wc_require_class(
+		plugin_dir_path( __FILE__ ) . 'includes/class-wc-braspress-deactivator.php',
+		'WC_Braspress_Deactivator'
+	)->deactivate();
 }
 
-/**
- * The code that runs during plugin deactivation.
- * This action is documented in includes/class-plugin-name-deactivator.php
- */
-function deactivate_plugin_name() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-plugin-name-deactivator.php';
-	Plugin_Name_Deactivator::deactivate();
-}
-
-register_activation_hook( __FILE__, 'activate_plugin_name' );
-register_deactivation_hook( __FILE__, 'deactivate_plugin_name' );
+register_activation_hook(   __FILE__, 'activate_woocommerce_braspress'   );
+register_deactivation_hook( __FILE__, 'deactivate_woocommerce_braspress' );
 
 /**
- * The core plugin class that is used to define internationalization,
- * admin-specific hooks, and public-facing site hooks.
- */
-require plugin_dir_path( __FILE__ ) . 'includes/class-plugin-name.php';
-
-/**
- * Begins execution of the plugin.
+ * This function require a class file an return
+ * an instantiate of the class.
  *
- * Since everything within the plugin is registered via hooks,
- * then kicking off the plugin from this point in the file does
- * not affect the page life cycle.
+ * @since   1.0.0
+ * @param   String      $file_path path to the class file.
+ * @param   String      $class_name class to be instantiated.
+ * @return  object|null The instance of the class.
+ */
+function wc_require_class( $file_path, $class_name ) {
+
+	if (file_exists($file_path)) {
+		require_once( $file_path );
+		return new $class_name;
+	}
+	return null;
+
+}
+
+/**
+ * This function starts the plugin execution.
  *
  * @since    1.0.0
  */
-function run_plugin_name() {
+function run_woocommerce_braspress() {
 
-	$plugin = new Plugin_Name();
-	$plugin->run();
+	/**
+	 * Validating if Woocommerce plugin was activated.
+	 */
+	if (WC_Braspress::is_woocommercer_activeted()){
+
+		$required_classes = array(
+			"includes/class-wc-braspress-loader.php",
+			"includes/class-wc-braspress-i18n.php",
+			"admin/class-wc-braspress-admin.php",
+			"public/class-wc-braspress-public.php",
+			"includes/{interfaces,traits}/*.php",
+		);
+
+		$plugin = new WC_Braspress(
+			new WC_Braspress_Loader( $required_classes )
+		);
+
+		$plugin->run();
+	}
 
 }
-run_plugin_name();
+
+run_woocommerce_braspress();

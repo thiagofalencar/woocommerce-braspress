@@ -10,7 +10,7 @@
  * - Check if the $_REQUEST content actually is the plugin name
  * - Run an admin referrer check to make sure it goes through authentication
  * - Verify the output of $_GET makes sense
- * - Repeat with other user roles. Best directly by using the links/query string parameters.
+ * - Repeat with other user roles. Best directly by using the links/query String parameters.
  * - Repeat things for multisite. Once for a single site in the network, once sitewide.
  *
  * This file may be updated more in future version of the Boilerplate; however, this is the
@@ -22,7 +22,7 @@
  * @link       http://example.com
  * @since      1.0.0
  *
- * @package    Plugin_Name
+ * @package    WC_Braspress
  */
 
 // If uninstall not called from WordPress, then exit.
