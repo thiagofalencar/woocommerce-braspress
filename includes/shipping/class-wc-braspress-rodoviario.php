@@ -32,8 +32,8 @@ class WC_Braspress_Rodoviario extends WC_Braspress_Shipping_Method implements WC
 		$this->id           = 'braspress-rodoviario';
 		$this->title        = __( 'Braspress Rodoviario', 'wc-braspress' );
 		$this->method_title = __( 'Braspress Rodoviario', 'wc-braspress' );
-		$this->type         = "A";
-		$this->category     = 1;
+		$this->mode         = "A";
+		$this->type         = 1;
 
 		parent::__construct( $instance_id );
 

@@ -96,30 +96,41 @@ class WC_Braspress_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script(
-			'default_js',
-			plugin_dir_url( __FILE__ ) . 'js/woocommerce-braspress-public.js',
-			array( 'jquery' ),
-			$this->version,
-			false
+		$scripts = array(
+			array(
+				'handle'        => 'input_mask',
+				'src'           => 'https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js',
+				'dependencies'  => array( 'jquery' ),
+				'version'       => $this->version,
+				'in_footer'     => true
+			),
+			array(
+				'handle'        => 'default_js',
+				'src'           => plugin_dir_url( __FILE__ ) . 'js/woocommerce-braspress-public.js',
+				'dependencies'  => array( 'jquery' ),
+				'version'       => $this->version,
+				'in_footer'     => true
+			),
+			array(
+				'handle'        => 'validate_cpf_cnpj',
+				'src'           => plugin_dir_url( __FILE__ ) . 'js/wc-braspress-cpf-cnpj-validate.js',
+				'dependencies'  => array( 'jquery' ),
+				'version'       => $this->version,
+				'in_footer'     => true
+			),
 		);
 
-		wp_enqueue_script(
-			'input_mask',
-			'https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js',
-			array( 'jquery' ),
-			$this->version,
-			false
+		array_walk($scripts,
+			function( $script ) {
+				wp_enqueue_script(
+					$script['handle'],
+					$script['src'],
+					$script['dependencies'],
+					$script['version'],
+					$script['in_footer']
+				);
+			}
 		);
-
-		wp_enqueue_script(
-			'validate_js',
-			plugin_dir_url( __FILE__ ) . 'js/wc-braspress-cpf-cnpj-validate.js',
-			array( 'jquery' ),
-			$this->version,
-			false
-		);
-
 	}
 
 	/**

@@ -34,8 +34,8 @@ class WC_Braspress_Aeropress_FOB extends WC_Braspress_Shipping_Method implements
 		$this->id           = 'braspress-aeropress_fob';
 		$this->title        = __( 'Braspress Aeropress - FOB', 'wc-braspress' );
 		$this->method_title = __( 'Braspress Aeropress - FOB', 'wc-braspress' );
-		$this->type         = "A";
-		$this->category     = 2;
+		$this->mode         = "A";
+		$this->type         = 2;
 
 		parent::__construct( $instance_id );
 

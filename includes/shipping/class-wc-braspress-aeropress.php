@@ -34,8 +34,8 @@ class WC_Braspress_Aeropress extends WC_Braspress_Shipping_Method implements WC_
 		$this->id           = 'braspress-aeropress';
 		$this->title        = __( 'Braspress Aeropress', 'wc-braspress' );
 		$this->method_title = __( 'Braspress Aeropress', 'wc-braspress' );
-		$this->type         = "A";
-		$this->category     = 1;
+		$this->mode         = "A";
+		$this->type         = 1;
 
 		parent::__construct( $instance_id );
 

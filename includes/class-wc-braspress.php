@@ -19,6 +19,9 @@
  * @package    WC_Braspress
  * @subpackage includes
  * @author     Thiago Alencar <thiagofalencar@gmail.com>
+ *
+ * TODO: SAVE CPF_CNPJ WOOCOMMERCE CUSTOMER.
+ *
  */
 class WC_Braspress {
 
@@ -136,11 +139,12 @@ class WC_Braspress {
 		 *
 		 */
 		$required_classes = array(
+			"includes/{interfaces,traits}/*.php",
 			"includes/class-wc-braspress-loader.php",
 			"includes/class-wc-braspress-i18n.php",
 			"admin/class-wc-braspress-admin.php",
 			"public/class-wc-braspress-public.php",
-			"includes/{interfaces,traits}/*.php",
+			"includes/class-wc-braspress-webservice.php",
 		);
 
 
@@ -212,33 +216,34 @@ class WC_Braspress {
 	 */
 	private function define_admin_hooks() {
 
-		$this->loader->add_action(
-			'admin_enqueue_scripts',
-			new WC_Braspress_Admin(
-				$this->get_name(),
-				$this->get_version()
+
+		$actions = array(
+			array(
+				'hook'      => 'admin_enqueue_scripts',
+				'component' => 	new WC_Braspress_Admin(
+					$this->get_name(),
+					$this->get_version()
+				),
+				'callback'  => 'enqueue_assets'
 			),
-			'enqueue_assets'
+
+			array(
+				'hook'      => 'woocommerce_after_shipping_calculator',
+				'component' => 	new WC_Braspress_Public(
+					$this->get_name(),
+					$this->get_version()
+				),
+				'callback'  => 'enqueue_assets'
+			)
 		);
 
-		$this->loader->add_action(
-			'woocommerce_after_shipping_calculator',
-			new WC_Braspress_Public(
-				$this->get_name(),
-				$this->get_version()
-			),
-			'enqueue_assets'
-		);
-
-		$this->loader->add_action(
-			'woocommerce_after_checkout_form',
-			new WC_Braspress_Public(
-				$this->get_name(),
-				$this->get_version()
-			),
-			'enqueue_assets'
-		);
-
+		foreach ( $actions as $action ){
+			$this->loader->add_action(
+				$action['hook'],
+				$action['component'],
+				$action['callback']
+			);
+		}
 
 	}
 
@@ -260,7 +265,13 @@ class WC_Braspress {
 			// TODO: VALIDATE CPF_CNPJ ON CALCULATOR
 			'woocommerce_checkout_process' => array(
 				"component" => $this,
-				"callback"  => 'customise_checkout_field_process',
+				"callback"  => 'customize_checkout_field_process',
+				"priority"  => 10,
+				"args"      => 1
+			),
+			'woocommerce_after_shipping_calculator' => array(
+				"component" => $this,
+				"callback"  => 'add_hidden_cpf_cnpj_field',
 				"priority"  => 10,
 				"args"      => 1
 			),
@@ -282,13 +293,10 @@ class WC_Braspress {
 		);
 	}
 
-	function customise_checkout_field_process()
+	function customize_checkout_field_process()
 	{
-		// TODO: VALIDATE CPF_CNPJ
-		if (!$_POST['billing_cpf_cnpj']) {
-			//$cpf_cnpj = new WC_CPF_CNPJ_Validate($_POST['billing_cpf_cnpj']);
-		}
-		wc_add_notice(__('Please enter value.') , 'error');
+		// TODO: ADD AN CPF_CNPJ VALIDATION
+		// $_POST['billing_cpf_cnpj'])
 	}
 
 	/**
@@ -307,10 +315,43 @@ class WC_Braspress {
 			'maxlength'     => "18",
 			'required'      => true,
 			'placeholder'   => 'CPF / CNPJ',
-			'class'         => array ('address-field', 'update_totals_on_change', 'cpf_cnpj' )
+			'class'         => array ('address-field', 'update_totals_on_change', 'cpf_cnpj' ),
+			'default'       =>  WC()->session->get( '_session_cpf_cnpj' ),
 		);
 
 		return $fields;
+	}
+
+	public function add_hidden_cpf_cnpj_field(){
+
+		$destination_cpf_cnpj = null;
+
+		if ( isset( $_POST['post_data'] ) ) {
+			$post_data = array();
+
+			parse_str( $_POST['post_data'], $post_data );
+
+			if ( isset( $post_data['billing_cpf_cnpj'] ) && $post_data['billing_cpf_cnpj'] != "" ) {
+				$destination_cpf_cnpj = $post_data['billing_cpf_cnpj'];
+			}
+
+		} elseif( isset( $_POST['calc_shipping_cpf'] ) && $_POST['calc_shipping_cpf'] != "" ) {
+			$destination_cpf_cnpj = $_POST['calc_shipping_cpf'];
+		}
+
+
+		$cpf_cnpj_session = WC()->session->get( '_session_cpf_cnpj' );
+
+		if ( !is_null( $destination_cpf_cnpj ) ) {
+			WC()->session->set('_session_cpf_cnpj', $destination_cpf_cnpj);
+		} elseif ( is_null($destination_cpf_cnpj ) ) {
+			$destination_cpf_cnpj = $cpf_cnpj_session;
+		}
+
+		echo sprintf(
+			"<input id='cpf_cnpj_post' value='%s' type='hidden' />",
+			$destination_cpf_cnpj
+		);
 	}
 
 	/**

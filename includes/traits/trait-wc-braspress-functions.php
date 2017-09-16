@@ -41,9 +41,16 @@ trait WC_Braspress_Functions {
 	 *
 	 * @return string       The text formatted.
 	 */
-	public function remove_chars( string $text ){
+	public function remove_chars( $text = "" ){
 		$text = preg_replace( '([^0-9])', '', $text );
 		return (string) $text;
+	}
+
+	public function normalize_money( $money ) {
+		$money = str_replace( '.', '', $money );
+		$money = str_replace( ',', '.', $money );
+
+		return $money;
 	}
 
 }

@@ -1,32 +1,1 @@
-(function( $ ) {
-	'use strict';
-
-	/**
-	 * All of the code for your admin-facing JavaScript source
-	 * should reside in this file.
-	 *
-	 * Note: It has been assumed you will write jQuery code here, so the
-	 * $ function reference has been prepared for usage within the scope
-	 * of this function.
-	 *
-	 * This enables you to define handlers, for when the DOM is ready:
-	 *
-	 * $(function() {
-	 *
-	 * });
-	 *
-	 * When the window is loaded:
-	 *
-	 * $( window ).load(function() {
-	 *
-	 * });
-	 *
-	 * ...and/or other possibilities.
-	 *
-	 * Ideally, it is not considered best practise to attach more than a
-	 * single DOM-ready or window-load handler for a particular page.
-	 * Although scripts in the WordPress core, Plugins and Themes may be
-	 * practising this, we should strive to set a better example in our own work.
-	 */
-
-})( jQuery );
+(function( $ ) {	'use strict';    var elem_cnpj	     = 'input.cpf_cnpj',        elem_postcode    = 'input.origin_postcode',        options_cpf_cnpj = {            onKeyPress: function (cpf_cnpj, e, field, options) {                var masks = ['000.000.000-000', '00.000.000/0000-00'],                    mask  = (cpf_cnpj.length > 14) ? masks[1] : masks[0];                $(elem_cnpj).mask(mask, options);            }        },        initial_cpf_cnpj_mask = '000.000.000-000000';    $(elem_cnpj     ).mask(initial_cpf_cnpj_mask, options_cpf_cnpj);    $(elem_postcode ).mask('00000-000');       })( jQuery );

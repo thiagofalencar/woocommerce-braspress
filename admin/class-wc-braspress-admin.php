@@ -101,7 +101,35 @@ class WC_Braspress_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->name, plugin_dir_url( __FILE__ ) . 'js/plugin-name-admin.js', array( 'jquery' ), $this->version, false );
+
+		$scripts = array(
+			array(
+				'handle'        => 'input_mask',
+				'src'           => 'https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js',
+				'dependencies'  => array( 'jquery' ),
+				'version'       => $this->version,
+				'in_footer'     => true
+			),
+			array(
+				'handle'        => 'default_js',
+				'src'           => plugin_dir_url( __FILE__ ) . 'js/plugin-name-admin.js',
+				'dependencies'  => array( 'jquery' ),
+				'version'       => $this->version,
+				'in_footer'     => true
+			)
+		);
+
+		array_walk($scripts,
+			function( $script ) {
+				wp_enqueue_script(
+					$script['handle'],
+					$script['src'],
+					$script['dependencies'],
+					$script['version'],
+					$script['in_footer']
+				);
+			}
+		);
 
 	}
 

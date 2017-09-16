@@ -32,8 +32,8 @@ class WC_Braspress_Rodoviario_FOB extends WC_Braspress_Shipping_Method implement
 		$this->id           = 'braspress-rodoviario_fob';
 		$this->title        = __( 'Braspress Rodoviario - FOB', 'wc-braspress' );
 		$this->method_title = __( 'Braspress Rodoviario - FOB', 'wc-braspress' );
-		$this->type         = "R";
-		$this->category     = 2;
+		$this->mode         = "R";
+		$this->type         = 2;
 
 		parent::__construct( $instance_id );
 

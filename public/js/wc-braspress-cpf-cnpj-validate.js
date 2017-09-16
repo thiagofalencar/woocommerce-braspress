@@ -14,7 +14,8 @@
 
     $('.cart-collaterals').on('click', 
         function () {
-            var is_braspress    = false,
+            var is_braspress    = true,
+                cpf_value       = "",
                 selectd_method  = $(this).find('.shipping_method[checked=checked]').attr('id');
 
             $.each( 
@@ -25,14 +26,19 @@
                     'braspress-aeropress_fob'
                 ],
                 function( index, value ) {
-                  is_braspress = ( selectd_method.indexOf(value) > 0 ) ? true : is_braspress;
+                  is_braspress = ( typeof selectd_method !== 'undefined' && selectd_method.indexOf(value) > 0 ) ? true : is_braspress;
                 }
             );
 
             if ( !$('#calc_shipping_cpf').length && is_braspress ) {
+
+                if ( $('#cpf_cnpj_post').length ) {
+                    cpf_value = $('#cpf_cnpj_post').val();
+                }
+
                 $('form.woocommerce-shipping-calculator p:last').before(
                     '<p class="form-row form-row-wide cpf_cnpj" id="calc_shipping_cpf_field">' +
-                    '   <input type="text" class="input-text" value="" placeholder="CPF / CNPJ" name="calc_shipping_cpf" id="calc_shipping_cpf">' +
+                    '   <input type="text" class="input-text" value="' + cpf_value + '" placeholder="CPF / CNPJ" name="calc_shipping_cpf" id="calc_shipping_cpf">' +
                     '</p>'
                 );
             };
