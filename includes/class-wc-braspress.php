@@ -335,10 +335,9 @@ class WC_Braspress {
 				$destination_cpf_cnpj = $post_data['billing_cpf_cnpj'];
 			}
 
-		} elseif( isset( $_POST['calc_shipping_cpf'] ) && $_POST['calc_shipping_cpf'] != "" ) {
-			$destination_cpf_cnpj = $_POST['calc_shipping_cpf'];
+		} elseif( isset( $_POST['calc_shipping_cpf'] ) && preg_replace( '/[^0-9]/', '', $_POST['calc_shipping_cpf'] ) != "" ) {
+			$destination_cpf_cnpj = preg_replace( '/[^0-9]/', '', $_POST['calc_shipping_cpf'] );
 		}
-
 
 		$cpf_cnpj_session = WC()->session->get( '_session_cpf_cnpj' );
 

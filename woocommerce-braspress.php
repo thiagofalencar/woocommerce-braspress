@@ -36,7 +36,7 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-wc-braspress-loader.php';
  * This function runs during Woocommerce-Braspress activation.
  */
 function activate_woocommerce_braspress() {
-	wc_require_class(
+	wcbra_require_class(
 		plugin_dir_path( __FILE__ ) . 'includes/class-wc-braspress-activator.php',
 		'WC_Braspress_Activator'
 	)->activate();
@@ -48,7 +48,7 @@ function activate_woocommerce_braspress() {
  * This function runs during Woocommerce-Braspress deactivation.
  */
 function deactivate_woocommerce_braspress() {
-	wc_require_class(
+	wcbra_require_class(
 		plugin_dir_path( __FILE__ ) . 'includes/class-wc-braspress-deactivator.php',
 		'WC_Braspress_Deactivator'
 	)->deactivate();
@@ -66,7 +66,7 @@ register_deactivation_hook( __FILE__, 'deactivate_woocommerce_braspress' );
  * @param   String      $class_name class to be instantiated.
  * @return  object|null The instance of the class.
  */
-function wc_require_class( $file_path, $class_name ) {
+function wcbra_require_class( $file_path, $class_name ) {
 
 	if (file_exists($file_path)) {
 		require_once( $file_path );
