@@ -94,7 +94,6 @@ abstract class WC_Braspress_Shipping_Method extends WC_Shipping_Method {
 		$this->destination_cpf_cnpj = $this->get_destination_cpf_cnpj();
 		$this->show_deadline_days   = $this->get_option( 'show_deadline_days' );
 		$this->additional_days      = $this->get_option( 'additional_days' );
-		$this->total_price          = '1000';
 
 		// Save admin options.
 		add_action( 'woocommerce_update_options_shipping_' . $this->id, array( $this, 'process_admin_options' ) );
