@@ -47,6 +47,7 @@ trait WC_CPF_CNPJ_Validate {
 		// Garante que o valor é uma string
 		$this->valor = (string)$this->valor;
 	}
+
 	/**
 	 * Verifica se é CPF ou CNPJ
 	 *

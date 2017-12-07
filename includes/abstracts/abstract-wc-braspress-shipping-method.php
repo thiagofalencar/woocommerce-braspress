@@ -46,12 +46,11 @@
 
 abstract class WC_Braspress_Shipping_Method extends WC_Shipping_Method {
 
-	use WC_CPF_CNPJ_Validate;
-
 	/*
-	 * Load the Trait WC_Braspress_Functions
+	 * Load the Trait's WC_Braspress_Functions and WC_CPF_CNPJ_Validate;
 	 */
 	use WC_Braspress_Functions;
+	use WC_CPF_CNPJ_Validate;
 
 	private $origin_postcode;
 	private $destination_cpf_cnpj;
@@ -95,9 +94,7 @@ abstract class WC_Braspress_Shipping_Method extends WC_Shipping_Method {
 		$this->destination_cpf_cnpj = $this->get_destination_cpf_cnpj();
 		$this->show_deadline_days   = $this->get_option( 'show_deadline_days' );
 		$this->additional_days      = $this->get_option( 'additional_days' );
-		$this->total_weight         = '10';
 		$this->total_price          = '1000';
-		$this->total_package        = '1';
 
 		// Save admin options.
 		add_action( 'woocommerce_update_options_shipping_' . $this->id, array( $this, 'process_admin_options' ) );
@@ -364,25 +361,93 @@ abstract class WC_Braspress_Shipping_Method extends WC_Shipping_Method {
 		$webservice->set_destination_postcode( $package['destination']['postcode'] );
 		$webservice->set_origin_cpf_cnpj($this->get_origin_cpf_cnpj() );
 		$webservice->set_destination_cpf_cnpj($this->get_destination_cpf_cnpj() );
-		$webservice->set_total_price($this->get_total_price() );
-		$webservice->set_total_weight($this->get_total_weight() );
-		$webservice->set_total_package( $this->get_total_package() );
+		$webservice->set_total_price($this->get_total_price( $package ) );
+		$webservice->set_total_weight($this->get_total_weight( $package ) );
+		$webservice->set_total_package( $this->get_total_package( $package ) );
 
 		$shipping = $webservice->get_shipping();
 
 		return $shipping;
 	}
 
-	protected function get_total_price(){
-		return $this->total_price;
+	protected function get_total_price( $package ){
+		return $package['contents_cost'];
 	}
 
-	protected function get_total_weight(){
-		return $this->total_weight;
+	protected function get_total_weight( $package ){
+		$mensured_package = $this->measures_extract($package);
+		return $mensured_package['weight'];
 	}
 
-	protected function get_total_package(){
-		return $this->total_package;
+
+	protected function measures_extract( $package ) {
+		$count  = 0;
+		$height = array();
+		$width  = array();
+		$length = array();
+		$weight = array();
+
+
+		// Shipping per item.
+		foreach ( $package['contents'] as $item_id => $values ) {
+			$product = $values['data'];
+			$qty = $values['quantity'];
+
+
+
+			if ( $qty > 0 && $product->needs_shipping() ) {
+
+
+				if ( version_compare( WOOCOMMERCE_VERSION, '2.1', '>=' ) ) {
+					$_height = wc_get_dimension( $this->fix_format( $product->height ), 'cm' );
+					$_width  = wc_get_dimension( $this->fix_format( $product->width ), 'cm' );
+					$_length = wc_get_dimension( $this->fix_format( $product->length ), 'cm' );
+					$_weight = wc_get_weight( $this->fix_format( $product->weight ), 'kg' );
+				} else {
+					$_height = woocommerce_get_dimension( $this->fix_format( $product->height ), 'cm' );
+					$_width  = woocommerce_get_dimension( $this->fix_format( $product->width ), 'cm' );
+					$_length = woocommerce_get_dimension( $this->fix_format( $product->length ), 'cm' );
+					$_weight = woocommerce_get_weight( $this->fix_format( $product->weight ), 'kg' );
+				}
+
+				$height[ $count ] = $_height;
+				$width[ $count ]  = $_width;
+				$length[ $count ] = $_length;
+				$weight[ $count ] = $_weight;
+
+				if ( $qty > 1 ) {
+					$n = $count;
+					for ( $i = 0; $i < $qty; $i++ ) {
+						$height[ $n ] = $_height;
+						$width[ $n ]  = $_width;
+						$length[ $n ] = $_length;
+						$weight[ $n ] = $_weight;
+						$n++;
+					}
+					$count = $n;
+				}
+
+				$count++;
+			}
+		}
+
+		return array(
+			'height' => array_values( $height ),
+			'length' => array_values( $length ),
+			'width'  => array_values( $width ),
+			'weight' => array_sum( $weight ),
+		);
+	}
+
+	protected function get_total_package( $package ){
+
+		$packageQuantity = 0;
+
+		array_walk($package['contents'], function($value) use (&$packageQuantity){
+			$packageQuantity += (int) $value['quantity'];
+		});
+
+		return $packageQuantity;
 	}
 
 

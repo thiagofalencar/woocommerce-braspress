@@ -53,4 +53,10 @@ trait WC_Braspress_Functions {
 		return $money;
 	}
 
+	private function fix_format( $value ) {
+		$value = str_replace( ',', '.', $value );
+
+		return $value;
+	}
+
 }
